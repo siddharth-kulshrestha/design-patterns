@@ -1,5 +1,10 @@
 package main
 
+import (
+	"errors"
+	"fmt"
+)
+
 // Abstract factory pattern lets you create a family of related objects
 // Abstract Factory is a creational design pattern that lets you produce families of related objects without specifying their concrete classes.
 
@@ -16,7 +21,7 @@ type iShort interface {
 	setBrand(name string)
 }
 
-type factory interface {
+type iFactory interface {
 	makeShoe() iShoe
 	makeShort() iShort
 }
@@ -89,4 +94,39 @@ func (adidasFactory) makeShort() iShort {
 	}
 }
 
-// TODO: complete this.
+type nikeFactory struct{}
+
+func (nikeFactory) makeShoe() iShoe {
+	return nikeShoe{
+		brand: "nike",
+		size:  9,
+	}
+}
+
+func (nikeFactory) makeShort() iShort {
+	return nikeShort{
+		brand:     "nike",
+		waistSize: 36,
+	}
+}
+
+func getSportsFactory(name string) (iFactory, error) {
+	switch name {
+	case "adidas":
+		return &adidasFactory{}, nil
+	case "nike":
+		return &nikeFactory{}, nil
+	}
+	return nil, errors.New("name is invalid")
+}
+
+func main() {
+	adidasFact, _ := getSportsFactory("adidas")
+	nikeFact, _ := getSportsFactory("nike")
+	adidasShoes := adidasFact.makeShoe()
+	nikeShorts := nikeFact.makeShort()
+
+	fmt.Println(adidasShoes)
+	fmt.Println(nikeShorts)
+
+}
